@@ -48,3 +48,48 @@ gunzip owt_valid.txt.gz
 cd ..
 ```
 
+
+### TinyStories full-data experiment
+
+From the repository root in WSL, download each official split to a temporary
+name. Re-run the same commands to resume an interrupted download. The filenames
+used by preprocessing are published only after SHA-256 verification.
+
+```bash
+mkdir -p data
+base=https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main
+for split in train valid; do
+  name=TinyStoriesV2-GPT4-$split.txt
+  test -f "data/$name" && continue
+  curl --fail --location --retry 5 --retry-delay 2 --continue-at - \
+    --output "data/$name.partial" "$base/$name" || break
+  case "$split" in
+    train) checksum=6418d412de72888f52b5142c761ac21a582f7d1166f0bfbdb5f03ccfdec90443 ;;
+    valid) checksum=6874bae9a4c1a4e7edcf0e53b86c17817e9cf881fc75ff2368da457b80c0585d ;;
+  esac
+  printf '%s  %s\n' "$checksum" "data/$name.partial" | sha256sum -c - || break
+  mv -n "data/$name.partial" "data/$name"
+done
+```
+
+Encode the two splits with the local 10K BPE artifact. Preprocessing writes
+memory-mappable uint16 arrays to a separate directory. Allow temporary space
+for one extra copy of the split currently being encoded.
+
+```bash
+uv run python preprocess_data.py \
+  --train data/TinyStoriesV2-GPT4-train.txt \
+  --val data/TinyStoriesV2-GPT4-valid.txt \
+  --output-dir outputs/lm_data/tinystories_full
+```
+
+On a CUDA machine, start with the experiment config. Command-line options such
+as `--lr` and `--output-dir` override config values. Choose a distinct output
+directory for each run.
+
+```bash
+uv run python train_lm.py --config configs/tinystories.json
+uv run python generate.py \
+  --checkpoint outputs/lm_runs/tinystories_baseline/best.pt \
+  --prompt "Once upon a time" --temperature 0.8 --top-p 0.95 --max-new-tokens 256
+```

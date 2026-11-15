@@ -1,0 +1,22 @@
+{
+  "train_data": "outputs/lm_data/tinystories_full/train.npy",
+  "val_data": "outputs/lm_data/tinystories_full/val.npy",
+  "output_dir": "outputs/lm_runs/tinystories_baseline",
+  "device": "cuda",
+  "seed": 42,
+  "vocab_size": 10000,
+  "context_length": 256,
+  "d_model": 512,
+  "d_ff": 1344,
+  "num_layers": 4,
+  "num_heads": 16,
+  "batch_size": 64,
+  "max_steps": 20000,
+  "cosine_cycle_iters": 20000,
+  "lr": 0.001,
+  "min_lr": 0.0001,
+  "warmup": 500,
+  "eval_every": 250,
+  "eval_batches": 32,
+  "save_every": 500
+}
