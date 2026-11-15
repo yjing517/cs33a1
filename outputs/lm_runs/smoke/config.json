@@ -1,0 +1,23 @@
+{
+  "train_data": "outputs/lm_data/train.npy",
+  "val_data": "outputs/lm_data/val.npy",
+  "output_dir": "outputs/lm_runs/smoke",
+  "resume": null,
+  "vocab_size": 10000,
+  "context_length": 64,
+  "d_model": 128,
+  "num_layers": 2,
+  "num_heads": 4,
+  "d_ff": 256,
+  "batch_size": 8,
+  "max_steps": 20,
+  "lr": 0.001,
+  "min_lr": 0.0001,
+  "warmup": 10,
+  "eval_every": 5,
+  "save_every": 10,
+  "eval_batches": 5,
+  "grad_clip": 1.0,
+  "device": "cpu",
+  "seed": 42
+}
